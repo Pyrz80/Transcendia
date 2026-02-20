@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  # PostgreSQL - Translation Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: transcendia-db
+    environment:
+      POSTGRES_USER: transcendia
+      POSTGRES_PASSWORD: transcendia_dev
+      POSTGRES_DB: transcendia
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U transcendia"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis - Cache Layer
+  redis:
+    image: redis:7-alpine
+    container_name: transcendia-cache
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Translation Hub API
+  api:
+    build:
+      context: ./packages/server
+      dockerfile: Dockerfile
+    container_name: transcendia-api
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      DATABASE_URL: postgresql://transcendia:transcendia_dev@postgres:5432/transcendia
+      REDIS_URL: redis://redis:6379
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./packages/server:/app
+      - /app/node_modules
+
+volumes:
+  postgres_data:
+  redis_data:

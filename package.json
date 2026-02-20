@@ -1,0 +1,28 @@
+{
+  "name": "transcendia",
+  "version": "1.0.0",
+  "description": "Dynamic Semantic Internationalization (DAU) Library",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspaces",
+    "build": "npm run build --workspaces",
+    "test": "npm run test --workspaces",
+    "lint": "npm run lint --workspaces"
+  },
+  "keywords": [
+    "i18n",
+    "internationalization",
+    "translation",
+    "localization",
+    "semantic",
+    "dynamic"
+  ],
+  "author": "Transcendia Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
